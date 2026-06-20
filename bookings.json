@@ -1,0 +1,32 @@
+[
+  {
+    "id": "b1",
+    "name": "sunny",
+    "phone": "+917893770579",
+    "date": "2026-06-20",
+    "time": "11:00",
+    "service": "Hair Patch Fitting",
+    "status": "Confirmed",
+    "timestamp": "2026-06-18T10:00:00.000Z"
+  },
+  {
+    "id": "b2",
+    "name": "Ahmed R.",
+    "phone": "+971520000000",
+    "date": "2026-06-22",
+    "time": "15:30",
+    "service": "Monthly Maintenance",
+    "status": "Pending",
+    "timestamp": "2026-06-18T11:15:00.000Z"
+  },
+  {
+    "id": "b3",
+    "name": "Khalid M.",
+    "phone": "+971521111111",
+    "date": "2026-06-17",
+    "time": "14:00",
+    "service": "Hair Patch Fitting",
+    "status": "Completed",
+    "timestamp": "2026-06-15T09:00:00.000Z"
+  }
+]

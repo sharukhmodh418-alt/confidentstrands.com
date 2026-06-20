@@ -1,0 +1,20 @@
+[
+  {
+    "id": "p2",
+    "customer": "Khalid M.",
+    "service": "Hair Patch Fitting",
+    "amount": "349",
+    "method": "Card",
+    "status": "Paid",
+    "timestamp": "2026-06-17T15:00:00.000Z"
+  },
+  {
+    "id": "p3",
+    "customer": "Ahmed R.",
+    "service": "Premium Hair Patch",
+    "amount": "1199",
+    "method": "Card",
+    "status": "Pending",
+    "timestamp": "2026-06-18T11:20:00.000Z"
+  }
+]

@@ -1,0 +1,2285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confident Strands - CRM Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Complete sidebar and main layout styling overrides */
+    :root {
+      --sidebar-width: 260px;
+      --sidebar-bg: #090d1a;
+      --content-bg: #05070e;
+      --nav-active-bg: rgba(201, 168, 76, 0.08);
+      --nav-hover-bg: rgba(255, 255, 255, 0.02);
+      --border-dark: rgba(255, 255, 255, 0.05);
+      --gold-crm: #e2c97e;
+      --accent-blue: #3b82f6;
+      --accent-green: #10b981;
+      --accent-purple: #8b5cf6;
+      --accent-pink: #ec4899;
+    }
+
+    body {
+      background: var(--content-bg);
+      color: var(--text-primary);
+      margin: 0;
+      font-family: 'Outfit', 'Inter', sans-serif;
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding: 0;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar-nav {
+      width: var(--sidebar-width);
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border-glass);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .sidebar-brand {
+      padding: 24px;
+      border-bottom: 1px solid var(--border-glass);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-brand .logo {
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      text-decoration: none;
+      letter-spacing: 0.5px;
+    }
+
+    .sidebar-brand .logo span {
+      color: var(--gold);
+    }
+
+    .sidebar-brand .sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .sidebar-menu {
+      flex: 1;
+      padding: 20px 12px;
+      overflow-y: auto;
+    }
+
+    .menu-header {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin: 16px 12px 10px 12px;
+      font-weight: 700;
+      opacity: 0.6;
+    }
+
+    .nav-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      margin-bottom: 6px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      width: calc(100% - 24px);
+      margin-left: 12px;
+      text-align: left;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-menu-item:hover {
+      background: var(--nav-hover-bg);
+      color: var(--text-primary);
+    }
+
+    .nav-menu-item.active {
+      background: var(--nav-active-bg);
+      color: var(--gold-light);
+      border-left: 3px solid var(--gold);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    }
+
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Main Content Wrapper */
+    .admin-main-content {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--content-bg);
+    }
+
+    .top-navbar {
+      height: 75px;
+      border-bottom: 1px solid var(--border-glass);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 40px;
+      background: var(--sidebar-bg);
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+
+    .top-title h2 {
+      margin: 0;
+      font-family: var(--font-heading);
+      font-size: 1.45rem;
+      font-weight: 700;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .content-viewport {
+      padding: 40px;
+      flex: 1;
+    }
+
+    /* Tab views visibility */
+    .tab-view {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .tab-view.active {
+      display: block;
+    }
+
+    /* Form elements custom styling */
+    .crm-form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 16px;
+    }
+
+    .crm-form-group label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 500;
+    }
+
+    .crm-input {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .crm-input:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 10px rgba(201, 168, 76, 0.1);
+    }
+
+    /* Dashboard view style items */
+    .dashboard-overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .dashboard-card {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dashboard-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--gold);
+    }
+
+    .dashboard-card.card-blue::before { background: var(--accent-blue); }
+    .dashboard-card.card-green::before { background: var(--accent-green); }
+    .dashboard-card.card-purple::before { background: var(--accent-purple); }
+
+    .dashboard-card h3 {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .dashboard-card .val {
+      font-family: var(--font-heading);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 12px 0 4px 0;
+    }
+
+    .dashboard-card .desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+
+    @media (max-width: 992px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .chart-box {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+
+    .chart-box h3 {
+      margin: 0 0 20px 0;
+      font-size: 1.1rem;
+      font-family: var(--font-heading);
+      letter-spacing: 0.5px;
+    }
+
+    /* Subsystem: Calendar Grid styling */
+    .calendar-wrapper {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      backdrop-filter: blur(15px);
+    }
+
+    .calendar-ctrl {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .calendar-ctrl h3 {
+      margin: 0;
+      font-family: var(--font-heading);
+      font-size: 1.3rem;
+      color: var(--gold-light);
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .cal-day-label {
+      font-weight: 700;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      padding: 8px 0;
+      text-align: center;
+    }
+
+    .cal-cell {
+      aspect-ratio: 1.3;
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 80px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .cal-cell:hover:not(.cal-empty) {
+      background: var(--bg-glass-hover);
+      border-color: var(--gold-light);
+    }
+
+    .cal-empty {
+      background: transparent;
+      border: 1px solid transparent;
+      cursor: default;
+    }
+
+    .cal-today {
+      background: rgba(201, 168, 76, 0.12);
+      border-color: var(--gold);
+    }
+
+    .cal-num {
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-align: right;
+      width: 100%;
+    }
+
+    .cal-appts {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      width: 100%;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .cal-appt-dot {
+      height: 4px;
+      border-radius: 2px;
+      width: 100%;
+    }
+
+    .appt-dot-pending { background: #fbbf24; }
+    .appt-dot-confirmed { background: #3b82f6; }
+    .appt-dot-completed { background: #10b981; }
+    .appt-dot-cancelled { background: #ef4444; }
+
+    /* Services cards styling */
+    .services-catalog {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .service-card {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+    }
+
+    .service-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-glass-hover);
+      background: var(--bg-glass-hover);
+    }
+
+    .service-card-title {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      margin: 0 0 8px 0;
+      color: var(--text-primary);
+    }
+
+    .service-card-price {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--gold-light);
+      margin-bottom: 8px;
+    }
+
+    .service-card-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .service-card-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    /* Modal standard styles */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      background: rgba(6, 10, 19, 0.85);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      animation: fadeIn 0.3s ease;
+      overflow-y: auto;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 600px;
+      padding: 32px;
+      position: relative;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    /* Utility & Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .text-right { text-align: right; }
+    .text-center { text-align: center; }
+
+    /* SVG Chart Layout details */
+    .svg-container {
+      position: relative;
+      width: 100%;
+      height: 200px;
+    }
+
+    /* Settings view styling */
+    .settings-container {
+      max-width: 700px;
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+    }
+
+    /* Table grid layout styling overrides */
+    .table-card {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(20px);
+      overflow: hidden;
+      margin-bottom: 40px;
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      font-family: var(--font-heading);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      padding: 16px 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border-glass);
+    }
+
+    td {
+      padding: 18px 20px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-glass);
+      transition: background-color 0.2s ease;
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-primary);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LEFT SIDEBAR NAVIGATION -->
+  <nav class="sidebar-nav">
+    <div class="sidebar-brand">
+      <a href="#" class="logo">Confident<span>Strands</span></a>
+      <span class="sub">Customer CRM System</span>
+    </div>
+    <div class="sidebar-menu">
+      <div class="menu-header">Main Menu</div>
+      
+      <!-- Dashboard Tab Option -->
+      <button class="nav-menu-item active" data-tab="dashboard">
+        <div class="nav-icon">
+          <!-- Colored Bar Chart SVG Icon -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <rect x="3" y="12" width="4" height="9" fill="var(--accent-pink)" stroke="var(--accent-pink)"></rect>
+            <rect x="10" y="5" width="4" height="16" fill="var(--accent-green)" stroke="var(--accent-green)"></rect>
+            <rect x="17" y="9" width="4" height="12" fill="var(--accent-blue)" stroke="var(--accent-blue)"></rect>
+          </svg>
+        </div>
+        <span>Dashboard</span>
+      </button>
+
+      <!-- Customers CRM Option -->
+      <button class="nav-menu-item" data-tab="customers">
+        <div class="nav-icon">
+          <!-- Purple People Icon SVG -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-purple)" stroke-width="2.5">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        </div>
+        <span>Customers</span>
+      </button>
+
+      <!-- Bookings Option -->
+      <button class="nav-menu-item" data-tab="bookings">
+        <div class="nav-icon">
+          <!-- Calendar Icon SVG -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2.5">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </div>
+        <span>Bookings</span>
+      </button>
+
+      <!-- Services Option -->
+      <button class="nav-menu-item" data-tab="services">
+        <div class="nav-icon">
+          <!-- Scissors icon styling -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-pink)" stroke-width="2.5">
+            <circle cx="6" cy="6" r="3"></circle>
+            <circle cx="6" cy="18" r="3"></circle>
+            <line x1="9.8" y1="8.2" x2="20" y2="17"></line>
+            <line x1="9.8" y1="15.8" x2="20" y2="7"></line>
+          </svg>
+        </div>
+        <span>Services</span>
+      </button>
+
+      <!-- Payments Option -->
+      <button class="nav-menu-item" data-tab="payments">
+        <div class="nav-icon">
+          <!-- Card Icon SVG -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-blue)" stroke-width="2.5">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+            <line x1="1" y1="10" x2="23" y2="10"></line>
+          </svg>
+        </div>
+        <span>Payments</span>
+      </button>
+
+      <!-- Calendar Option -->
+      <button class="nav-menu-item" data-tab="calendar">
+        <div class="nav-icon">
+          <!-- Calendar grid SVG icon -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2.5">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="9" y1="3" x2="9" y2="21"></line>
+            <line x1="15" y1="3" x2="15" y2="21"></line>
+            <line x1="3" y1="9" x2="21" y2="9"></line>
+            <line x1="3" y1="15" x2="21" y2="15"></line>
+          </svg>
+        </div>
+        <span>Calendar</span>
+      </button>
+
+      <!-- Reports Option -->
+      <button class="nav-menu-item" data-tab="reports">
+        <div class="nav-icon">
+          <!-- Upward Line Graph SVG -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-purple)" stroke-width="2.5">
+            <path d="M3 3v18h18"></path>
+            <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path>
+          </svg>
+        </div>
+        <span>Reports</span>
+      </button>
+
+      <!-- Settings Option -->
+      <button class="nav-menu-item" data-tab="settings">
+        <div class="nav-icon">
+          <!-- Gear Icon SVG -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2.5">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </div>
+        <span>Settings</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MAIN VIEW CONTAINER -->
+  <main class="admin-main-content">
+    
+    <!-- Header / Navbar -->
+    <header class="top-navbar">
+      <div class="top-title">
+        <h2 id="topViewportTitle">Dashboard Overview</h2>
+      </div>
+      <div class="top-actions">
+        <button id="refreshBtn" class="btn btn-secondary">
+          <span>↻ Refresh</span>
+        </button>
+        <div id="topPrimaryActionContainer">
+          <!-- Dynamic action buttons inject here -->
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Port -->
+    <div class="content-viewport">
+
+      <!-- ==================== TAB 1: DASHBOARD ==================== -->
+      <section class="tab-view active" id="dashboardTab">
+        <!-- Stats summary cards -->
+        <div class="dashboard-overview-grid">
+          <div class="dashboard-card card-blue">
+            <h3>Total CRM Leads</h3>
+            <div class="val" id="dashTotalLeads">0</div>
+            <div class="desc">Lead submissions received</div>
+          </div>
+          <div class="dashboard-card card-green">
+            <h3>Total Income</h3>
+            <div class="val" id="dashTotalRevenue">AED 0</div>
+            <div class="desc">From paid invoices list</div>
+          </div>
+          <div class="dashboard-card card-purple">
+            <h3>Booked Slots</h3>
+            <div class="val" id="dashTotalBookings">0</div>
+            <div class="desc">Active scheduled consultations</div>
+          </div>
+          <div class="dashboard-card">
+            <h3>Total Services</h3>
+            <div class="val" id="dashTotalServices">0</div>
+            <div class="desc">Active services configured</div>
+          </div>
+        </div>
+
+        <div class="charts-grid">
+          <!-- Revenue trend line SVG -->
+          <div class="chart-box">
+            <h3>Revenue Growth (June 2026)</h3>
+            <div class="svg-container">
+              <svg width="100%" height="100%" viewBox="0 0 600 200" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="chart-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="var(--gold)" stop-opacity="0.3"></stop>
+                    <stop offset="100%" stop-color="var(--gold)" stop-opacity="0.0"></stop>
+                  </linearGradient>
+                </defs>
+                <!-- Grid Lines -->
+                <line x1="0" y1="50" x2="600" y2="50" stroke="rgba(255,255,255,0.05)" stroke-width="1"></line>
+                <line x1="0" y1="100" x2="600" y2="100" stroke="rgba(255,255,255,0.05)" stroke-width="1"></line>
+                <line x1="0" y1="150" x2="600" y2="150" stroke="rgba(255,255,255,0.05)" stroke-width="1"></line>
+                
+                <!-- Path area -->
+                <path d="M 0 170 Q 150 140, 300 90 T 600 50 L 600 200 L 0 200 Z" fill="url(#chart-grad)"></path>
+                <!-- Line -->
+                <path d="M 0 170 Q 150 140, 300 90 T 600 50" fill="none" stroke="var(--gold)" stroke-width="3"></path>
+                <!-- Points -->
+                <circle cx="0" cy="170" r="4" fill="var(--gold-light)"></circle>
+                <circle cx="150" cy="145" r="4" fill="var(--gold-light)"></circle>
+                <circle cx="300" cy="90" r="4" fill="var(--gold-light)"></circle>
+                <circle cx="450" cy="70" r="4" fill="var(--gold-light)"></circle>
+                <circle cx="600" cy="50" r="4" fill="var(--gold-light)"></circle>
+              </svg>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-muted); margin-top:10px;">
+              <span>June 1st</span>
+              <span>June 8th</span>
+              <span>June 15th</span>
+              <span>June 22nd</span>
+              <span>June 29th</span>
+            </div>
+          </div>
+
+          <!-- Hairloss breakdown progress bars -->
+          <div class="chart-box">
+            <h3>Hair Loss Stages</h3>
+            <div id="dashHairlossBreakdown">
+              <!-- Dynamically populated progress bars -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Leads summary table -->
+        <div class="table-card">
+          <div style="padding:20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-glass)">
+            <h3 style="margin:0; font-family:var(--font-heading); font-size:1.1rem;">Recent Lead Submissions</h3>
+            <button class="btn btn-secondary" style="padding:6px 12px; font-size:0.8rem;" onclick="switchTab('customers')">View All</button>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="dashRecentLeadsBody">
+                <!-- Javascript fills here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 2: CUSTOMERS (CRM LIST) ==================== -->
+      <section class="tab-view" id="customersTab">
+        <!-- Filters & Search Controls -->
+        <div class="controls-wrapper">
+          <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+            <div class="filter-tabs">
+              <button class="filter-btn active" data-filter="all">All Types</button>
+              <button class="filter-btn" data-filter="Consultation">Consultations</button>
+              <button class="filter-btn" data-filter="Quiz">Quiz Results</button>
+            </div>
+            <div class="filter-tabs" id="statusFilterTabs">
+              <button class="filter-btn status-filter-btn active" data-status-filter="all">All Statuses</button>
+              <button class="filter-btn status-filter-btn" data-status-filter="New">New</button>
+              <button class="filter-btn status-filter-btn" data-status-filter="Contacted">Contacted</button>
+              <button class="filter-btn status-filter-btn" data-status-filter="Booked">Booked</button>
+              <button class="filter-btn status-filter-btn" data-status-filter="Completed">Completed</button>
+              <button class="filter-btn status-filter-btn" data-status-filter="Declined">Declined</button>
+            </div>
+          </div>
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" class="search-input" placeholder="Search by name, email, or phone...">
+          </div>
+        </div>
+
+        <!-- Main table -->
+        <div class="table-card">
+          <div class="table-container">
+            <table id="leadsTable">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Email / Score</th>
+                  <th>Status</th>
+                  <th>Date / Time</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody">
+                <tr>
+                  <td colspan="7" class="loading-state">
+                    <span class="state-icon">🔄</span>
+                    Loading submissions...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 3: BOOKINGS ==================== -->
+      <section class="tab-view" id="bookingsTab">
+        <div class="controls-wrapper" style="margin-bottom: 24px;">
+          <div class="filter-tabs" id="bookingFilterGroup">
+            <button class="filter-btn active" data-booking-filter="all">All Bookings</button>
+            <button class="filter-btn" data-booking-filter="Pending">Pending</button>
+            <button class="filter-btn" data-booking-filter="Confirmed">Confirmed</button>
+            <button class="filter-btn" data-booking-filter="Completed">Completed</button>
+            <button class="filter-btn" data-booking-filter="Cancelled">Cancelled</button>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Customer</th>
+                  <th>Phone</th>
+                  <th>Service Requested</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="bookingsTableBody">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 4: SERVICES ==================== -->
+      <section class="tab-view" id="servicesTab">
+        <div class="services-catalog" id="servicesGrid">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+
+      <!-- ==================== TAB 5: PAYMENTS ==================== -->
+      <section class="tab-view" id="paymentsTab">
+        <div class="dashboard-overview-grid" style="margin-bottom: 30px;">
+          <div class="dashboard-card card-green">
+            <h3>Total Paid Revenue</h3>
+            <div class="val" id="paymentsTotalRev">AED 0</div>
+            <div class="desc">Sum of all Paid status invoice amounts</div>
+          </div>
+          <div class="dashboard-card card-blue">
+            <h3>Pending Invoices</h3>
+            <div class="val" id="paymentsPendingRev">AED 0</div>
+            <div class="desc">Outstanding pending transaction values</div>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Customer</th>
+                  <th>Service</th>
+                  <th>Amount</th>
+                  <th>Method</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="paymentsTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 6: CALENDAR ==================== -->
+      <section class="tab-view" id="calendarTab">
+        <div class="calendar-wrapper">
+          <div class="calendar-ctrl">
+            <button class="btn btn-secondary" id="calPrevMonthBtn">◀ Previous</button>
+            <h3 id="calendarMonthTitle">June 2026</h3>
+            <button class="btn btn-secondary" id="calNextMonthBtn">Next ▶</button>
+          </div>
+          <div class="calendar-grid" id="calendarGridBody">
+            <!-- Dynamically populated calendar grid cell nodes -->
+          </div>
+        </div>
+        
+        <div class="chart-box" style="margin-top:24px; display:none;" id="calDayDetailsPanel">
+          <h4 style="margin:0 0 16px 0; font-family:var(--font-heading);" id="calDayDetailsTitle">Appointments on this day</h4>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Time</th>
+                  <th>Service</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="calDayDetailsBody">
+                <!-- Filled on click -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 7: REPORTS ==================== -->
+      <section class="tab-view" id="reportsTab">
+        <div class="charts-grid">
+          <div class="chart-box">
+            <h3>Submissions by Type</h3>
+            <div style="height: 250px; display: flex; align-items: flex-end; justify-content: space-around; padding-bottom: 20px; border-bottom: 1px solid var(--border-glass);">
+              <div style="text-align:center; width: 30%;">
+                <div style="background: var(--accent-blue); width: 60px; margin: 0 auto; border-radius: 6px 6px 0 0; min-height: 20px; transition: height 0.5s ease;" id="reportBarConsult"></div>
+                <div style="margin-top:10px; font-weight:600;" id="reportBarConsultVal">0</div>
+                <div style="font-size:0.85rem; color:var(--text-muted);">Consultations</div>
+              </div>
+              <div style="text-align:center; width: 30%;">
+                <div style="background: var(--accent-purple); width: 60px; margin: 0 auto; border-radius: 6px 6px 0 0; min-height: 20px; transition: height 0.5s ease;" id="reportBarQuiz"></div>
+                <div style="margin-top:10px; font-weight:600;" id="reportBarQuizVal">0</div>
+                <div style="font-size:0.85rem; color:var(--text-muted);">Quizzes</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="chart-box">
+            <h3>Revenue Breakdown</h3>
+            <div id="reportPaymentMethodBreakdown" style="padding-top: 10px;">
+              <!-- Dynamically populated progress bars showing cash vs card vs bank transfer values -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 8: SETTINGS ==================== -->
+      <section class="tab-view" id="settingsTab">
+        <div class="settings-container">
+          <form id="crmSettingsForm">
+            <div class="crm-form-group">
+              <label for="setClinicName">Clinic Name</label>
+              <input type="text" id="setClinicName" class="crm-input" required>
+            </div>
+            <div class="crm-form-group">
+              <label for="setWhatsappNumber">WhatsApp Contact Number</label>
+              <input type="text" id="setWhatsappNumber" class="crm-input" required>
+            </div>
+            <div class="crm-form-group">
+              <label for="setCurrency">Currency Code</label>
+              <input type="text" id="setCurrency" class="crm-input" required>
+            </div>
+            <div class="crm-form-group">
+              <label for="setWorkingHours">Working Hours Description</label>
+              <input type="text" id="setWorkingHours" class="crm-input" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%; margin-top:20px;">💾 Save System Configuration</button>
+          </form>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ==================== SYSTEM MODALS ==================== -->
+  
+  <!-- Submissions/Lead Detail Modal -->
+  <div class="modal" id="detailsModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeModalBtn">&times;</span>
+      <div class="modal-header">
+        <h3 id="modalTitle">Submission Details</h3>
+        <span class="badge" id="modalTypeBadge">Type</span>
+      </div>
+      <div class="detail-grid" id="modalDetailsGrid">
+        <!-- Dynamic Content -->
+      </div>
+      <div class="modal-actions-footer">
+        <button id="deleteLeadBtn" class="btn btn-danger">🗑️ Delete Lead</button>
+        <button id="saveLeadBtn" class="btn btn-primary">💾 Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking Create/Edit Modal -->
+  <div class="modal" id="bookingModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeBookingModalBtn">&times;</span>
+      <div class="modal-header">
+        <h3 id="bookingModalTitle">Schedule New Appointment</h3>
+      </div>
+      <form id="bookingForm" style="margin-top: 20px;">
+        <input type="hidden" id="bookingEditId">
+        <div class="crm-form-group">
+          <label for="bookingCustName">Customer Full Name *</label>
+          <input type="text" id="bookingCustName" class="crm-input" required>
+        </div>
+        <div class="crm-form-group">
+          <label for="bookingCustPhone">Phone Number *</label>
+          <input type="text" id="bookingCustPhone" class="crm-input" required>
+        </div>
+        <div class="crm-form-group">
+          <label for="bookingService">Service *</label>
+          <select id="bookingServiceSelect" class="crm-input" style="background:#0b0f19;" required>
+            <!-- Services injected here -->
+          </select>
+        </div>
+        <div class="form-group-row">
+          <div class="crm-form-group">
+            <label for="bookingDate">Date *</label>
+            <input type="date" id="bookingDate" class="crm-input" required>
+          </div>
+          <div class="crm-form-group">
+            <label for="bookingTime">Time *</label>
+            <input type="time" id="bookingTime" class="crm-input" required>
+          </div>
+        </div>
+        <div class="crm-form-group">
+          <label for="bookingStatus">Booking Status</label>
+          <select id="bookingStatusSelect" class="crm-input" style="background:#0b0f19;">
+            <option value="Pending">Pending</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">💾 Save Appointment</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Service Create/Edit Modal -->
+  <div class="modal" id="serviceModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeServiceModalBtn">&times;</span>
+      <div class="modal-header">
+        <h3 id="serviceModalTitle">Service Catalog Configuration</h3>
+      </div>
+      <form id="serviceForm" style="margin-top: 20px;">
+        <input type="hidden" id="serviceEditId">
+        <div class="crm-form-group">
+          <label for="serviceName">Service Name *</label>
+          <input type="text" id="serviceName" class="crm-input" required>
+        </div>
+        <div class="crm-form-group">
+          <label for="servicePrice">Price (AED) *</label>
+          <input type="number" id="servicePrice" class="crm-input" required>
+        </div>
+        <div class="crm-form-group">
+          <label for="serviceDuration">Duration Description (e.g. 45 mins)</label>
+          <input type="text" id="serviceDuration" class="crm-input" placeholder="e.g. 45 mins">
+        </div>
+        <div class="crm-form-group">
+          <label for="serviceDescription">Service Description</label>
+          <textarea id="serviceDescription" class="crm-input" style="min-height: 80px; resize:vertical;"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">💾 Save Service Details</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Payment Create/Edit Modal -->
+  <div class="modal" id="paymentModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closePaymentModalBtn">&times;</span>
+      <div class="modal-header">
+        <h3 id="paymentModalTitle">Record Payment Transaction</h3>
+      </div>
+      <form id="paymentForm" style="margin-top: 20px;">
+        <input type="hidden" id="paymentEditId">
+        <div class="crm-form-group">
+          <label for="paymentCustomer">Customer Name *</label>
+          <input type="text" id="paymentCustomer" class="crm-input" required>
+        </div>
+        <div class="crm-form-group">
+          <label for="paymentService">Service Name / Description *</label>
+          <input type="text" id="paymentService" class="crm-input" required>
+        </div>
+        <div class="crm-form-group">
+          <label for="paymentAmount">Invoice Amount *</label>
+          <input type="number" id="paymentAmount" class="crm-input" required>
+        </div>
+        <div class="crm-form-group">
+          <label for="paymentMethod">Payment Method</label>
+          <select id="paymentMethodSelect" class="crm-input" style="background:#0b0f19;">
+            <option value="Cash">Cash</option>
+            <option value="Card">Card</option>
+            <option value="Bank Transfer">Bank Transfer</option>
+          </select>
+        </div>
+        <div class="crm-form-group">
+          <label for="paymentStatus">Invoice Status</label>
+          <select id="paymentStatusSelect" class="crm-input" style="background:#0b0f19;">
+            <option value="Paid">Paid</option>
+            <option value="Pending">Pending</option>
+            <option value="Refunded">Refunded</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;">💾 Record Payment</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT CRM INTERACTIVITY ==================== -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Since the frontend and backend are served together on the same server, we use relative paths.
+      const API_BASE_URL = '';
+
+      // Memory state arrays
+      let allSubmissions = [];
+      let allBookings = [];
+      let allServices = [];
+      let allPayments = [];
+      let systemSettings = {};
+
+      // Routing tab elements
+      const navItems = document.querySelectorAll('.nav-menu-item');
+      const tabViews = document.querySelectorAll('.tab-view');
+      const topViewportTitle = document.getElementById('topViewportTitle');
+      const topPrimaryActionContainer = document.getElementById('topPrimaryActionContainer');
+      let activeTab = 'dashboard';
+
+      // Table elements
+      const tableBody = document.getElementById('tableBody');
+      const refreshBtn = document.getElementById('refreshBtn');
+      const searchInput = document.getElementById('searchInput');
+
+      // Filters for Customers/Leads CRM
+      const typeFilterBtns = document.querySelectorAll('.filter-btn:not(.status-filter-btn)');
+      const statusFilterBtns = document.querySelectorAll('.status-filter-btn');
+      let currentTypeFilter = 'all';
+      let currentStatusFilter = 'all';
+      let searchQuery = '';
+
+      // Filters for bookings
+      const bookingFilterBtns = document.querySelectorAll('#bookingFilterGroup .filter-btn');
+      let currentBookingFilter = 'all';
+
+      // Details Modal submissions crm
+      const detailsModal = document.getElementById('detailsModal');
+      const closeModalBtn = document.getElementById('closeModalBtn');
+      const modalTypeBadge = document.getElementById('modalTypeBadge');
+      const modalDetailsGrid = document.getElementById('modalDetailsGrid');
+      const deleteLeadBtn = document.getElementById('deleteLeadBtn');
+      const saveLeadBtn = document.getElementById('saveLeadBtn');
+      let currentlyEditingLeadId = null;
+
+      // Booking modal
+      const bookingModal = document.getElementById('bookingModal');
+      const closeBookingModalBtn = document.getElementById('closeBookingModalBtn');
+      const bookingForm = document.getElementById('bookingForm');
+
+      // Service modal
+      const serviceModal = document.getElementById('serviceModal');
+      const closeServiceModalBtn = document.getElementById('closeServiceModalBtn');
+      const serviceForm = document.getElementById('serviceForm');
+
+      // Payment modal
+      const paymentModal = document.getElementById('paymentModal');
+      const closePaymentModalBtn = document.getElementById('closePaymentModalBtn');
+      const paymentForm = document.getElementById('paymentForm');
+
+      // Settings form
+      const crmSettingsForm = document.getElementById('crmSettingsForm');
+
+      // Calendar state tracker
+      let calendarDate = new Date(); // Today
+
+      // Initialize Application Tabs
+      navItems.forEach(item => {
+        item.addEventListener('click', () => {
+          const tabName = item.getAttribute('data-tab');
+          switchTab(tabName);
+        });
+      });
+
+      function switchTab(tabName) {
+        activeTab = tabName;
+        
+        // Navigation visual toggle
+        navItems.forEach(nav => nav.classList.remove('active'));
+        document.querySelector(`.nav-menu-item[data-tab="${tabName}"]`).classList.add('active');
+
+        // View toggle
+        tabViews.forEach(view => view.classList.remove('active'));
+        const targetView = document.getElementById(`${tabName}Tab`);
+        if (targetView) targetView.classList.add('active');
+
+        // Update header title
+        topViewportTitle.textContent = tabName.charAt(0).toUpperCase() + tabName.slice(1) + (tabName === 'customers' ? ' CRM' : ' Panel');
+
+        // Render top primary action button dynamically based on tab
+        renderTopActionBtn(tabName);
+
+        // Fetch data/render specifically for that page
+        refreshActiveTabData();
+      }
+
+      function renderTopActionBtn(tabName) {
+        topPrimaryActionContainer.innerHTML = '';
+        if (tabName === 'bookings') {
+          topPrimaryActionContainer.innerHTML = `
+            <button class="btn btn-primary" id="topActionAddBookingBtn">
+              <span>📅 Schedule Appointment</span>
+            </button>
+          `;
+          document.getElementById('topActionAddBookingBtn').addEventListener('click', () => openBookingModal());
+        } else if (tabName === 'services') {
+          topPrimaryActionContainer.innerHTML = `
+            <button class="btn btn-primary" id="topActionAddServiceBtn">
+              <span>✂️ Create Service</span>
+            </button>
+          `;
+          document.getElementById('topActionAddServiceBtn').addEventListener('click', () => openServiceModal());
+        } else if (tabName === 'payments') {
+          topPrimaryActionContainer.innerHTML = `
+            <button class="btn btn-primary" id="topActionAddPaymentBtn">
+              <span>📥 Record Invoice</span>
+            </button>
+          `;
+          document.getElementById('topActionAddPaymentBtn').addEventListener('click', () => openPaymentModal());
+        } else if (tabName === 'customers') {
+          topPrimaryActionContainer.innerHTML = `
+            <button class="btn btn-primary" id="topActionExportCsvBtn">
+              <span>📥 Export CSV</span>
+            </button>
+          `;
+          document.getElementById('topActionExportCsvBtn').addEventListener('click', triggerExportCSV);
+        }
+      }
+
+      async function refreshActiveTabData() {
+        if (activeTab === 'dashboard') {
+          await Promise.all([fetchSubmissions(), fetchBookings(), fetchServices(), fetchPayments()]);
+          renderDashboard();
+        } else if (activeTab === 'customers') {
+          await fetchSubmissions();
+          renderCustomersTable();
+        } else if (activeTab === 'bookings') {
+          await Promise.all([fetchBookings(), fetchServices()]);
+          renderBookingsTable();
+        } else if (activeTab === 'services') {
+          await fetchServices();
+          renderServicesGrid();
+        } else if (activeTab === 'payments') {
+          await fetchPayments();
+          renderPaymentsTable();
+        } else if (activeTab === 'calendar') {
+          await fetchBookings();
+          renderCalendar();
+        } else if (activeTab === 'reports') {
+          await Promise.all([fetchSubmissions(), fetchPayments()]);
+          renderReportsView();
+        } else if (activeTab === 'settings') {
+          await fetchSettings();
+          populateSettingsForm();
+        }
+      }
+
+      // Refresh button trigger
+      refreshBtn.addEventListener('click', refreshActiveTabData);
+
+      // ==================== FETCH API CALLS ====================
+      async function fetchSubmissions() {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/submissions`);
+          if (!res.ok) throw new Error('API failed');
+          allSubmissions = await res.json();
+          allSubmissions.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        } catch (err) {
+          console.error('Failed to fetch leads', err);
+        }
+      }
+
+      async function fetchBookings() {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/bookings`);
+          if (!res.ok) throw new Error('API failed');
+          allBookings = await res.json();
+          allBookings.sort((a, b) => new Date(b.date + 'T' + b.time) - new Date(a.date + 'T' + a.time));
+        } catch (err) {
+          console.error('Failed to fetch bookings', err);
+        }
+      }
+
+      async function fetchServices() {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/services`);
+          if (!res.ok) throw new Error('API failed');
+          allServices = await res.json();
+        } catch (err) {
+          console.error('Failed to fetch services', err);
+        }
+      }
+
+      async function fetchPayments() {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/payments`);
+          if (!res.ok) throw new Error('API failed');
+          allPayments = await res.json();
+          allPayments.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        } catch (err) {
+          console.error('Failed to fetch payments', err);
+        }
+      }
+
+      async function fetchSettings() {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/settings`);
+          if (!res.ok) throw new Error('API failed');
+          systemSettings = await res.json();
+        } catch (err) {
+          console.error('Failed to fetch settings', err);
+        }
+      }
+
+      // ==================== DASHBOARD DISPLAY ====================
+      function renderDashboard() {
+        // Core metrics
+        document.getElementById('dashTotalLeads').textContent = allSubmissions.length;
+        document.getElementById('dashTotalBookings').textContent = allBookings.filter(b => b.status === 'Confirmed' || b.status === 'Pending').length;
+        document.getElementById('dashTotalServices').textContent = allServices.length;
+
+        // Paid revenue calculation
+        const revenueTotal = allPayments
+          .filter(p => p.status === 'Paid')
+          .reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+        document.getElementById('dashTotalRevenue').textContent = 'AED ' + revenueTotal.toLocaleString();
+
+        // Recent Lead Table Fill
+        const recentLeads = allSubmissions.slice(0, 5);
+        const recentBody = document.getElementById('dashRecentLeadsBody');
+        if (recentLeads.length === 0) {
+          recentBody.innerHTML = `<tr><td colspan="5" class="text-center">No lead submissions found.</td></tr>`;
+        } else {
+          recentBody.innerHTML = recentLeads.map(lead => {
+            const statusBadge = `<span class="badge badge-${(lead.status || 'New').toLowerCase()}">${lead.status || 'New'}</span>`;
+            const dateStr = new Date(lead.timestamp).toLocaleDateString();
+            return `
+              <tr style="cursor:pointer;" onclick="switchTab('customers'); showDetails('${lead.id}')">
+                <td><strong style="color:var(--text-primary);">${escapeHtml(lead.name)}</strong></td>
+                <td>${escapeHtml(lead.phone)}</td>
+                <td>${lead.type}</td>
+                <td>${statusBadge}</td>
+                <td>${dateStr}</td>
+              </tr>
+            `;
+          }).join('');
+        }
+
+        // Hair loss breakdown progress bars dashboard
+        const hairlossTotal = allSubmissions.filter(s => s.hairloss || s.answers?.step1).length;
+        const stagesCount = { early: 0, moderate: 0, advanced: 0, complete: 0 };
+        allSubmissions.forEach(s => {
+          let stageVal = s.hairloss || s.answers?.step1 || '';
+          stageVal = stageVal.toLowerCase();
+          if (stageVal.includes('early') || stageVal === 'early') stagesCount.early++;
+          else if (stageVal.includes('moderate') || stageVal === 'moderate') stagesCount.moderate++;
+          else if (stageVal.includes('advanced') || stageVal === 'advanced') stagesCount.advanced++;
+          else if (stageVal.includes('complete') || stageVal === 'complete') stagesCount.complete++;
+        });
+
+        const calcPercent = (val) => hairlossTotal > 0 ? Math.round((val / hairlossTotal) * 100) : 0;
+        const breakdownDiv = document.getElementById('dashHairlossBreakdown');
+        
+        breakdownDiv.innerHTML = `
+          <div class="bar-prog-row">
+            <div class="bar-prog-header"><span>Early Thinning</span><span>${stagesCount.early} (${calcPercent(stagesCount.early)}%)</span></div>
+            <div class="bar-prog-track"><div class="bar-prog-fill" style="width:${calcPercent(stagesCount.early)}%; background:var(--accent-blue)"></div></div>
+          </div>
+          <div class="bar-prog-row">
+            <div class="bar-prog-header"><span>Moderate Receding</span><span>${stagesCount.moderate} (${calcPercent(stagesCount.moderate)}%)</span></div>
+            <div class="bar-prog-track"><div class="bar-prog-fill" style="width:${calcPercent(stagesCount.moderate)}%; background:var(--accent-purple)"></div></div>
+          </div>
+          <div class="bar-prog-row">
+            <div class="bar-prog-header"><span>Advanced Baldness</span><span>${stagesCount.advanced} (${calcPercent(stagesCount.advanced)}%)</span></div>
+            <div class="bar-prog-track"><div class="bar-prog-fill" style="width:${calcPercent(stagesCount.advanced)}%; background:var(--accent-pink)"></div></div>
+          </div>
+          <div class="bar-prog-row">
+            <div class="bar-prog-header"><span>Complete Baldness</span><span>${stagesCount.complete} (${calcPercent(stagesCount.complete)}%)</span></div>
+            <div class="bar-prog-track"><div class="bar-prog-fill" style="width:${calcPercent(stagesCount.complete)}%; background:var(--gold)"></div></div>
+          </div>
+        `;
+      }
+
+      // ==================== TAB 2: CUSTOMERS (LEADS CRM) ====================
+      function renderCustomersTable() {
+        let filtered = allSubmissions;
+
+        // Apply type filter
+        if (currentTypeFilter !== 'all') {
+          filtered = filtered.filter(s => s.type === currentTypeFilter);
+        }
+
+        // Apply status filter
+        if (currentStatusFilter !== 'all') {
+          filtered = filtered.filter(s => (s.status || 'New') === currentStatusFilter);
+        }
+
+        // Apply search query
+        if (searchQuery) {
+          const query = searchQuery.toLowerCase();
+          filtered = filtered.filter(s => 
+            (s.name && s.name.toLowerCase().includes(query)) ||
+            (s.email && s.email.toLowerCase().includes(query)) ||
+            (s.phone && s.phone.toLowerCase().includes(query))
+          );
+        }
+
+        if (filtered.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="7" class="empty-state">
+                <span class="state-icon">📂</span>
+                No submissions found matching criteria.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tableBody.innerHTML = filtered.map(sub => {
+          const typeBadge = sub.type === 'Quiz' 
+            ? '<span class="badge badge-quiz">Quiz</span>' 
+            : '<span class="badge badge-consultation">Consultation</span>';
+          
+          const detailCol = sub.type === 'Quiz'
+            ? `Score: ${sub.score || '95'}%`
+            : (sub.email || '<span style="color: var(--text-muted);">No email</span>');
+
+          const status = sub.status || 'New';
+          const statusClass = 'badge-' + status.toLowerCase();
+          const statusBadge = `<span class="badge ${statusClass}">${status}</span>`;
+          const formattedDate = new Date(sub.timestamp).toLocaleString();
+
+          return `
+            <tr data-id="${sub.id}">
+              <td>${typeBadge}</td>
+              <td style="font-weight: 600; color: var(--text-primary);">${escapeHtml(sub.name)}</td>
+              <td>${escapeHtml(sub.phone)}</td>
+              <td>${detailCol}</td>
+              <td>${statusBadge}</td>
+              <td>${formattedDate}</td>
+              <td><button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.75rem;">View Details</button></td>
+            </tr>
+          `;
+        }).join('');
+
+        // Attach click handlers to rows
+        document.querySelectorAll('#leadsTable tbody tr').forEach(row => {
+          const id = row.getAttribute('data-id');
+          if (!id) return;
+          row.addEventListener('click', () => showDetails(id));
+        });
+      }
+
+      // Show Details Modal submissions CRM
+      function showDetails(id) {
+        const sub = allSubmissions.find(s => s.id === id);
+        if (!sub) return;
+
+        currentlyEditingLeadId = id;
+
+        // Set type badge
+        modalTypeBadge.className = 'badge ' + (sub.type === 'Quiz' ? 'badge-quiz' : 'badge-consultation');
+        modalTypeBadge.textContent = sub.type;
+
+        // Build details grid
+        let html = `
+          <div class="detail-item">
+            <span class="label">Name</span>
+            <span class="value">${escapeHtml(sub.name)}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Phone</span>
+            <span class="value"><a href="tel:${sub.phone}" style="color: var(--gold-light);">${escapeHtml(sub.phone)}</a></span>
+          </div>
+        `;
+
+        if (sub.type === 'Consultation') {
+          html += `
+            <div class="detail-item">
+              <span class="label">Email</span>
+              <span class="value">${sub.email ? escapeHtml(sub.email) : 'Not provided'}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Date of Birth</span>
+              <span class="value">${sub.dob || 'Not provided'}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Hair Loss Stage</span>
+              <span class="value">${sub.hairloss ? sub.hairloss.toUpperCase() : 'Not provided'}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Submitted Date</span>
+              <span class="value">${new Date(sub.timestamp).toLocaleString()}</span>
+            </div>
+            <div class="detail-item detail-full-width">
+              <span class="label">User Message / Notes</span>
+              <span class="value" style="white-space: pre-line;">${sub.message ? escapeHtml(sub.message) : 'No message provided.'}</span>
+            </div>
+          `;
+        } else if (sub.type === 'Quiz') {
+          html += `
+            <div class="detail-item">
+              <span class="label">Match Score</span>
+              <span class="value" style="font-weight: bold; color: var(--success);">${sub.score || '95'}%</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">Submitted Date</span>
+              <span class="value">${new Date(sub.timestamp).toLocaleString()}</span>
+            </div>
+            <div class="detail-item detail-full-width">
+              <span class="label">Quiz Answers</span>
+              <div class="quiz-answers-list">
+                <div class="quiz-answer-row">
+                  <div class="quiz-question-text">1. Hair Loss Stage:</div>
+                  <div class="quiz-answer-val">${sub.answers?.step1 || 'Not answered'}</div>
+                </div>
+                <div class="quiz-answer-row">
+                  <div class="quiz-question-text">2. Age Range:</div>
+                  <div class="quiz-answer-val">${sub.answers?.step2 || 'Not answered'}</div>
+                </div>
+                <div class="quiz-answer-row">
+                  <div class="quiz-question-text">3. Confidence Impact:</div>
+                  <div class="quiz-answer-val">${sub.answers?.step3 || 'Not answered'}</div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        const status = sub.status || 'New';
+        const notes = sub.notes || '';
+
+        html += `
+          <div class="detail-item detail-full-width" style="margin-top: 16px; border-top: 1px solid var(--border-glass); padding-top: 16px;">
+            <h4 style="font-family: var(--font-heading); color: var(--gold); margin-bottom: 12px;">Lead Management</h4>
+          </div>
+          <div class="detail-item">
+            <span class="label">Lead Status</span>
+            <select id="modalStatusSelect" class="form-input" style="background: var(--bg-secondary); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 8px 12px; color: var(--text-primary); margin-top: 6px; width: 100%;">
+              <option value="New" ${status === 'New' ? 'selected' : ''}>New</option>
+              <option value="Contacted" ${status === 'Contacted' ? 'selected' : ''}>Contacted</option>
+              <option value="Booked" ${status === 'Booked' ? 'selected' : ''}>Booked</option>
+              <option value="Completed" ${status === 'Completed' ? 'selected' : ''}>Completed</option>
+              <option value="Declined" ${status === 'Declined' ? 'selected' : ''}>Declined</option>
+            </select>
+          </div>
+          <div class="detail-item detail-full-width" style="margin-top: 12px;">
+            <span class="label">Follow-up Notes / Comments</span>
+            <textarea id="modalNotesTextarea" class="form-input" style="width: calc(100% - 24px); min-height: 100px; background: var(--bg-secondary); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 12px; color: var(--text-primary); margin-top: 6px; font-family: inherit; font-size: 0.9rem;" placeholder="Write internal notes about this lead...">${escapeHtml(notes)}</textarea>
+          </div>
+        `;
+
+        modalDetailsGrid.innerHTML = html;
+        detailsModal.classList.add('active');
+      }
+
+      // Save Lead Changes (CRM submissions)
+      saveLeadBtn.addEventListener('click', async () => {
+        if (!currentlyEditingLeadId) return;
+
+        const newStatus = document.getElementById('modalStatusSelect').value;
+        const newNotes = document.getElementById('modalNotesTextarea').value;
+
+        saveLeadBtn.textContent = '⌛ Saving...';
+        saveLeadBtn.disabled = true;
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/submissions/${currentlyEditingLeadId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              status: newStatus,
+              notes: newNotes
+            })
+          });
+
+          if (!response.ok) throw new Error('Failed to update submission');
+
+          // Update local data state
+          const index = allSubmissions.findIndex(s => s.id === currentlyEditingLeadId);
+          if (index !== -1) {
+            allSubmissions[index].status = newStatus;
+            allSubmissions[index].notes = newNotes;
+          }
+
+          renderCustomersTable();
+          detailsModal.classList.remove('active');
+        } catch (err) {
+          console.error(err);
+          alert('Error saving changes: ' + err.message);
+        } finally {
+          saveLeadBtn.textContent = '💾 Save Changes';
+          saveLeadBtn.disabled = false;
+        }
+      });
+
+      // Delete Lead
+      deleteLeadBtn.addEventListener('click', async () => {
+        if (!currentlyEditingLeadId) return;
+
+        const confirmDelete = confirm('Are you sure you want to permanently delete this lead? This action cannot be undone.');
+        if (!confirmDelete) return;
+
+        deleteLeadBtn.textContent = '⌛ Deleting...';
+        deleteLeadBtn.disabled = true;
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/submissions/${currentlyEditingLeadId}`, {
+            method: 'DELETE'
+          });
+
+          if (!response.ok) throw new Error('Failed to delete submission');
+
+          // Remove from local data state
+          allSubmissions = allSubmissions.filter(s => s.id !== currentlyEditingLeadId);
+
+          renderCustomersTable();
+          detailsModal.classList.remove('active');
+        } catch (err) {
+          console.error(err);
+          alert('Error deleting lead: ' + err.message);
+        } finally {
+          deleteLeadBtn.textContent = '🗑️ Delete Lead';
+          deleteLeadBtn.disabled = false;
+        }
+      });
+
+      // Close Modals
+      closeModalBtn.addEventListener('click', () => detailsModal.classList.remove('active'));
+      closeBookingModalBtn.addEventListener('click', () => bookingModal.classList.remove('active'));
+      closeServiceModalBtn.addEventListener('click', () => serviceModal.classList.remove('active'));
+      closePaymentModalBtn.addEventListener('click', () => paymentModal.classList.remove('active'));
+
+      // Filter tabs event bindings
+      typeFilterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          typeFilterBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentTypeFilter = btn.getAttribute('data-filter');
+          renderCustomersTable();
+        });
+      });
+
+      statusFilterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          statusFilterBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentStatusFilter = btn.getAttribute('data-status-filter');
+          renderCustomersTable();
+        });
+      });
+
+      searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value;
+        renderCustomersTable();
+      });
+
+
+      // ==================== TAB 3: BOOKINGS PANEL ====================
+      function renderBookingsTable() {
+        let filtered = allBookings;
+        if (currentBookingFilter !== 'all') {
+          filtered = filtered.filter(b => b.status === currentBookingFilter);
+        }
+
+        const body = document.getElementById('bookingsTableBody');
+        if (filtered.length === 0) {
+          body.innerHTML = `<tr><td colspan="8" class="text-center">No bookings found matching criteria.</td></tr>`;
+          return;
+        }
+
+        body.innerHTML = filtered.map(b => {
+          const statusBadge = `<span class="badge badge-${(b.status || 'Pending').toLowerCase()}">${b.status || 'Pending'}</span>`;
+          return `
+            <tr>
+              <td><code>${b.id}</code></td>
+              <td><strong style="color:var(--text-primary);">${escapeHtml(b.name)}</strong></td>
+              <td>${escapeHtml(b.phone)}</td>
+              <td>${escapeHtml(b.service)}</td>
+              <td>${b.date}</td>
+              <td>${b.time}</td>
+              <td>${statusBadge}</td>
+              <td>
+                <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem;" onclick="openBookingModal('${b.id}')">Edit</button>
+                <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem; background:rgba(239,68,68,0.1); color:#ef4444; border-color:rgba(239,68,68,0.2);" onclick="deleteBooking('${b.id}')">Delete</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      bookingFilterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          bookingFilterBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentBookingFilter = btn.getAttribute('data-booking-filter');
+          renderBookingsTable();
+        });
+      });
+
+      window.openBookingModal = function(id = null) {
+        // Populate service options in dropdown
+        const select = document.getElementById('bookingServiceSelect');
+        select.innerHTML = allServices.map(s => `<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('');
+        if (allServices.length === 0) {
+          select.innerHTML = `<option value="Consultation">Free Consultation</option><option value="Hair Patch Fitting">Hair Patch Fitting</option><option value="Monthly Maintenance">Monthly Maintenance</option>`;
+        }
+
+        if (id) {
+          const b = allBookings.find(x => x.id === id);
+          if (b) {
+            document.getElementById('bookingModalTitle').textContent = 'Edit Scheduled Appointment';
+            document.getElementById('bookingEditId').value = b.id;
+            document.getElementById('bookingCustName').value = b.name;
+            document.getElementById('bookingCustPhone').value = b.phone;
+            document.getElementById('bookingServiceSelect').value = b.service;
+            document.getElementById('bookingDate').value = b.date;
+            document.getElementById('bookingTime').value = b.time;
+            document.getElementById('bookingStatusSelect').value = b.status || 'Pending';
+          }
+        } else {
+          document.getElementById('bookingModalTitle').textContent = 'Schedule New Appointment';
+          bookingForm.reset();
+          document.getElementById('bookingEditId').value = '';
+          document.getElementById('bookingDate').value = new Date().toISOString().split('T')[0];
+        }
+        bookingModal.classList.add('active');
+      };
+
+      bookingForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const editId = document.getElementById('bookingEditId').value;
+        const data = {
+          name: document.getElementById('bookingCustName').value,
+          phone: document.getElementById('bookingCustPhone').value,
+          service: document.getElementById('bookingServiceSelect').value,
+          date: document.getElementById('bookingDate').value,
+          time: document.getElementById('bookingTime').value,
+          status: document.getElementById('bookingStatusSelect').value
+        };
+
+        const method = editId ? 'PUT' : 'POST';
+        const url = editId ? `${API_BASE_URL}/api/bookings/${editId}` : `${API_BASE_URL}/api/bookings`;
+
+        try {
+          const res = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          if (!res.ok) throw new Error('Saving booking failed');
+          
+          bookingModal.classList.remove('active');
+          await fetchBookings();
+          renderBookingsTable();
+        } catch (err) {
+          alert('Error: ' + err.message);
+        }
+      });
+
+      window.deleteBooking = async function(id) {
+        if (!confirm('Are you sure you want to cancel and delete this booking?')) return;
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/bookings/${id}`, { method: 'DELETE' });
+          if (!res.ok) throw new Error('API failed');
+          await fetchBookings();
+          renderBookingsTable();
+        } catch (err) {
+          alert(err.message);
+        }
+      };
+
+
+      // ==================== TAB 4: SERVICES PANEL ====================
+      function renderServicesGrid() {
+        const grid = document.getElementById('servicesGrid');
+        if (allServices.length === 0) {
+          grid.innerHTML = `<div class="text-center" style="grid-column: 1/-1; padding: 40px;">No clinic services configured yet. Click "Create Service" to add one.</div>`;
+          return;
+        }
+
+        grid.innerHTML = allServices.map(s => {
+          return `
+            <div class="service-card">
+              <div>
+                <h4 class="service-card-title">${escapeHtml(s.name)}</h4>
+                <div class="service-card-price">AED ${parseFloat(s.price).toLocaleString()}</div>
+                <div class="service-card-meta">
+                  <span>🕒 ${escapeHtml(s.duration)}</span>
+                </div>
+                <p class="service-card-desc">${escapeHtml(s.description || 'No service description provided.')}</p>
+              </div>
+              <div style="display:flex; gap:10px; margin-top:20px; border-top:1px solid var(--border-glass); padding-top:16px;">
+                <button class="btn btn-secondary" style="flex:1; padding:8px 0; font-size:0.8rem;" onclick="openServiceModal('${s.id}')">Edit</button>
+                <button class="btn btn-secondary" style="flex:1; padding:8px 0; font-size:0.8rem; background:rgba(239,68,68,0.1); color:#ef4444; border-color:rgba(239,68,68,0.2);" onclick="deleteService('${s.id}')">Delete</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      window.openServiceModal = function(id = null) {
+        if (id) {
+          const s = allServices.find(x => x.id === id);
+          if (s) {
+            document.getElementById('serviceModalTitle').textContent = 'Edit Clinic Service';
+            document.getElementById('serviceEditId').value = s.id;
+            document.getElementById('serviceName').value = s.name;
+            document.getElementById('servicePrice').value = s.price;
+            document.getElementById('serviceDuration').value = s.duration;
+            document.getElementById('serviceDescription').value = s.description || '';
+          }
+        } else {
+          document.getElementById('serviceModalTitle').textContent = 'Create Clinic Service';
+          serviceForm.reset();
+          document.getElementById('serviceEditId').value = '';
+          document.getElementById('serviceDuration').value = '45 mins';
+        }
+        serviceModal.classList.add('active');
+      };
+
+      serviceForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const editId = document.getElementById('serviceEditId').value;
+        const data = {
+          name: document.getElementById('serviceName').value,
+          price: document.getElementById('servicePrice').value,
+          duration: document.getElementById('serviceDuration').value,
+          description: document.getElementById('serviceDescription').value
+        };
+
+        const method = editId ? 'PUT' : 'POST';
+        const url = editId ? `${API_BASE_URL}/api/services/${editId}` : `${API_BASE_URL}/api/services`;
+
+        try {
+          const res = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          if (!res.ok) throw new Error('API failed');
+          
+          serviceModal.classList.remove('active');
+          await fetchServices();
+          renderServicesGrid();
+        } catch (err) {
+          alert(err.message);
+        }
+      });
+
+      window.deleteService = async function(id) {
+        if (!confirm('Are you sure you want to delete this service?')) return;
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/services/${id}`, { method: 'DELETE' });
+          if (!res.ok) throw new Error('API failed');
+          await fetchServices();
+          renderServicesGrid();
+        } catch (err) {
+          alert(err.message);
+        }
+      };
+
+
+      // ==================== TAB 5: PAYMENTS PANEL ====================
+      function renderPaymentsTable() {
+        const body = document.getElementById('paymentsTableBody');
+        const paidRevEl = document.getElementById('paymentsTotalRev');
+        const pendingRevEl = document.getElementById('paymentsPendingRev');
+
+        let paidSum = 0;
+        let pendingSum = 0;
+
+        allPayments.forEach(p => {
+          const amt = parseFloat(p.amount || 0);
+          if (p.status === 'Paid') paidSum += amt;
+          else if (p.status === 'Pending') pendingSum += amt;
+        });
+
+        paidRevEl.textContent = 'AED ' + paidSum.toLocaleString();
+        pendingRevEl.textContent = 'AED ' + pendingSum.toLocaleString();
+
+        if (allPayments.length === 0) {
+          body.innerHTML = `<tr><td colspan="8" class="text-center">No payment transactions recorded.</td></tr>`;
+          return;
+        }
+
+        body.innerHTML = allPayments.map(p => {
+          const statusBadge = `<span class="badge badge-${p.status === 'Paid' ? 'completed' : p.status === 'Pending' ? 'booked' : 'declined'}">${p.status}</span>`;
+          const dateStr = new Date(p.timestamp).toLocaleDateString();
+          return `
+            <tr>
+              <td><code>${p.id}</code></td>
+              <td><strong>${escapeHtml(p.customer)}</strong></td>
+              <td>${escapeHtml(p.service)}</td>
+              <td style="font-weight:700; color:var(--gold-light);">AED ${parseFloat(p.amount).toLocaleString()}</td>
+              <td>${p.method}</td>
+              <td>${statusBadge}</td>
+              <td>${dateStr}</td>
+              <td>
+                <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem;" onclick="openPaymentModal('${p.id}')">Edit</button>
+                <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem; background:rgba(239,68,68,0.1); color:#ef4444; border-color:rgba(239,68,68,0.2);" onclick="deletePayment('${p.id}')">Delete</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      window.openPaymentModal = function(id = null) {
+        if (id) {
+          const p = allPayments.find(x => x.id === id);
+          if (p) {
+            document.getElementById('paymentModalTitle').textContent = 'Edit Payment Invoice';
+            document.getElementById('paymentEditId').value = p.id;
+            document.getElementById('paymentCustomer').value = p.customer;
+            document.getElementById('paymentService').value = p.service;
+            document.getElementById('paymentAmount').value = p.amount;
+            document.getElementById('paymentMethodSelect').value = p.method;
+            document.getElementById('paymentStatusSelect').value = p.status;
+          }
+        } else {
+          document.getElementById('paymentModalTitle').textContent = 'Record New Payment';
+          paymentForm.reset();
+          document.getElementById('paymentEditId').value = '';
+        }
+        paymentModal.classList.add('active');
+      };
+
+      paymentForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const editId = document.getElementById('paymentEditId').value;
+        const data = {
+          customer: document.getElementById('paymentCustomer').value,
+          service: document.getElementById('paymentService').value,
+          amount: document.getElementById('paymentAmount').value,
+          method: document.getElementById('paymentMethodSelect').value,
+          status: document.getElementById('paymentStatusSelect').value
+        };
+
+        const method = editId ? 'PUT' : 'POST';
+        const url = editId ? `${API_BASE_URL}/api/payments/${editId}` : `${API_BASE_URL}/api/payments`;
+
+        try {
+          const res = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          if (!res.ok) throw new Error('API failed');
+          
+          paymentModal.classList.remove('active');
+          await fetchPayments();
+          renderPaymentsTable();
+        } catch (err) {
+          alert(err.message);
+        }
+      });
+
+      window.deletePayment = async function(id) {
+        if (!confirm('Are you sure you want to delete this payment record?')) return;
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/payments/${id}`, { method: 'DELETE' });
+          if (!res.ok) throw new Error('API failed');
+          await fetchPayments();
+          renderPaymentsTable();
+        } catch (err) {
+          alert(err.message);
+        }
+      };
+
+
+      // ==================== TAB 6: CALENDAR VIEW ====================
+      function renderCalendar() {
+        const grid = document.getElementById('calendarGridBody');
+        const monthTitle = document.getElementById('calendarMonthTitle');
+        
+        const year = calendarDate.getFullYear();
+        const month = calendarDate.getMonth();
+        
+        // Month title
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        monthTitle.textContent = `${monthNames[month]} ${year}`;
+
+        // Get first day of month and total days
+        const firstDayIndex = new Date(year, month, 1).getDay();
+        const totalDays = new Date(year, month + 1, 0).getDate();
+
+        // Build grid cells
+        let html = '';
+        
+        // 7 Day Labels
+        const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        html += dayNames.map(day => `<div class="cal-day-label">${day}</div>`).join('');
+
+        // Empty cells before first day
+        for (let i = 0; i < firstDayIndex; i++) {
+          html += `<div class="cal-cell cal-empty"></div>`;
+        }
+
+        const today = new Date();
+        const bookingsMap = {};
+        allBookings.forEach(b => {
+          // b.date is string YYYY-MM-DD
+          bookingsMap[b.date] = bookingsMap[b.date] || [];
+          bookingsMap[b.date].push(b);
+        });
+
+        // Day cells
+        for (let day = 1; day <= totalDays; day++) {
+          const cellDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          const dayBookings = bookingsMap[cellDateStr] || [];
+          
+          const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === day;
+          const cellClass = 'cal-cell' + (isToday ? ' cal-today' : '');
+
+          const dotsHtml = dayBookings.slice(0, 3).map(b => {
+            let statusClass = 'appt-dot-pending';
+            if (b.status === 'Confirmed') statusClass = 'appt-dot-confirmed';
+            else if (b.status === 'Completed') statusClass = 'appt-dot-completed';
+            else if (b.status === 'Cancelled') statusClass = 'appt-dot-cancelled';
+            return `<div class="cal-appt-dot ${statusClass}" title="${escapeHtml(b.name)} - ${b.time}"></div>`;
+          }).join('');
+
+          html += `
+            <div class="${cellClass}" onclick="showCalendarDayDetails('${cellDateStr}', ${day})">
+              <div class="cal-num">${day}</div>
+              <div class="cal-appts">
+                ${dotsHtml}
+                ${dayBookings.length > 3 ? `<div style="font-size:0.65rem; color:var(--gold-light); font-weight:700;">+${dayBookings.length - 3} more</div>` : ''}
+              </div>
+            </div>
+          `;
+        }
+
+        grid.innerHTML = html;
+      }
+
+      window.showCalendarDayDetails = function(dateStr, dayNum) {
+        const dayBookings = allBookings.filter(b => b.date === dateStr);
+        const panel = document.getElementById('calDayDetailsPanel');
+        const title = document.getElementById('calDayDetailsTitle');
+        const body = document.getElementById('calDayDetailsBody');
+
+        title.textContent = `Appointments on ${dateStr}`;
+        if (dayBookings.length === 0) {
+          body.innerHTML = `<tr><td colspan="4" class="text-center">No appointments scheduled for this day.</td></tr>`;
+        } else {
+          body.innerHTML = dayBookings.map(b => {
+            const statusBadge = `<span class="badge badge-${(b.status || 'Pending').toLowerCase()}">${b.status || 'Pending'}</span>`;
+            return `
+              <tr>
+                <td><strong>${escapeHtml(b.name)}</strong></td>
+                <td>${b.time}</td>
+                <td>${escapeHtml(b.service)}</td>
+                <td>${statusBadge}</td>
+              </tr>
+            `;
+          }).join('');
+        }
+        panel.style.display = 'block';
+      };
+
+      document.getElementById('calPrevMonthBtn').addEventListener('click', () => {
+        calendarDate.setMonth(calendarDate.getMonth() - 1);
+        renderCalendar();
+        document.getElementById('calDayDetailsPanel').style.display = 'none';
+      });
+
+      document.getElementById('calNextMonthBtn').addEventListener('click', () => {
+        calendarDate.setMonth(calendarDate.getMonth() + 1);
+        renderCalendar();
+        document.getElementById('calDayDetailsPanel').style.display = 'none';
+      });
+
+
+      // ==================== TAB 7: REPORTS VIEW ====================
+      function renderReportsView() {
+        const totalLeads = allSubmissions.length;
+        const consults = allSubmissions.filter(s => s.type === 'Consultation').length;
+        const quizzes = allSubmissions.filter(s => s.type === 'Quiz').length;
+
+        // Animate submission bar height
+        const consultHeight = totalLeads > 0 ? Math.round((consults / totalLeads) * 200) : 20;
+        const quizHeight = totalLeads > 0 ? Math.round((quizzes / totalLeads) * 200) : 20;
+
+        const consultBar = document.getElementById('reportBarConsult');
+        const quizBar = document.getElementById('reportBarQuiz');
+        
+        consultBar.style.height = consultHeight + 'px';
+        quizBar.style.height = quizHeight + 'px';
+
+        document.getElementById('reportBarConsultVal').textContent = `${consults} (${totalLeads > 0 ? Math.round((consults/totalLeads)*100) : 0}%)`;
+        document.getElementById('reportBarQuizVal').textContent = `${quizzes} (${totalLeads > 0 ? Math.round((quizzes/totalLeads)*100) : 0}%)`;
+
+        // Payment method distribution calculator
+        const methodCounts = { cash: 0, card: 0, bank: 0 };
+        let paidAmountTotal = 0;
+
+        allPayments.forEach(p => {
+          if (p.status === 'Paid') {
+            const amt = parseFloat(p.amount || 0);
+            paidAmountTotal += amt;
+            const methodStr = (p.method || 'Cash').toLowerCase();
+            if (methodStr.includes('cash')) methodCounts.cash += amt;
+            else if (methodStr.includes('card')) methodCounts.card += amt;
+            else if (methodStr.includes('bank') || methodStr.includes('transfer')) methodCounts.bank += amt;
+          }
+        });
+
+        const calcPercent = (val) => paidAmountTotal > 0 ? Math.round((val / paidAmountTotal) * 100) : 0;
+        const methodsDiv = document.getElementById('reportPaymentMethodBreakdown');
+        
+        methodsDiv.innerHTML = `
+          <div class="bar-prog-row">
+            <div class="bar-prog-header"><span>💵 Cash Payments</span><span>AED ${methodCounts.cash.toLocaleString()} (${calcPercent(methodCounts.cash)}%)</span></div>
+            <div class="bar-prog-track"><div class="bar-prog-fill" style="width:${calcPercent(methodCounts.cash)}%; background:var(--accent-green)"></div></div>
+          </div>
+          <div class="bar-prog-row" style="margin-top:20px;">
+            <div class="bar-prog-header"><span>💳 Card Transactions</span><span>AED ${methodCounts.card.toLocaleString()} (${calcPercent(methodCounts.card)}%)</span></div>
+            <div class="bar-prog-track"><div class="bar-prog-fill" style="width:${calcPercent(methodCounts.card)}%; background:var(--accent-blue)"></div></div>
+          </div>
+          <div class="bar-prog-row" style="margin-top:20px;">
+            <div class="bar-prog-header"><span>🏛️ Bank Transfer</span><span>AED ${methodCounts.bank.toLocaleString()} (${calcPercent(methodCounts.bank)}%)</span></div>
+            <div class="bar-prog-track"><div class="bar-prog-fill" style="width:${calcPercent(methodCounts.bank)}%; background:var(--gold)"></div></div>
+          </div>
+        `;
+      }
+
+
+      // ==================== TAB 8: SETTINGS VIEW ====================
+      function populateSettingsForm() {
+        document.getElementById('setClinicName').value = systemSettings.clinicName || 'Confident Strands Studio';
+        document.getElementById('setWhatsappNumber').value = systemSettings.whatsappNumber || '971523002576';
+        document.getElementById('setCurrency').value = systemSettings.currency || 'AED';
+        document.getElementById('setWorkingHours').value = systemSettings.workingHours || 'Sat - Thu: 10AM - 9PM';
+      }
+
+      crmSettingsForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = {
+          clinicName: document.getElementById('setClinicName').value,
+          whatsappNumber: document.getElementById('setWhatsappNumber').value,
+          currency: document.getElementById('setCurrency').value,
+          workingHours: document.getElementById('setWorkingHours').value
+        };
+
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/settings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          if (!res.ok) throw new Error('API request failed');
+          alert('System configuration updated successfully!');
+        } catch (err) {
+          alert('Error: ' + err.message);
+        }
+      });
+
+
+      // ==================== CSV EXPORT METHOD ====================
+      function triggerExportCSV() {
+        if (allSubmissions.length === 0) {
+          alert('No submissions to export');
+          return;
+        }
+
+        let csvContent = 'data:text/csv;charset=utf-8,';
+        csvContent += 'ID,Type,Status,Name,Phone,Email/Score,Details/Answers,Internal Notes,Timestamp\n';
+
+        allSubmissions.forEach(sub => {
+          const id = sub.id || '';
+          const type = sub.type || '';
+          const status = sub.status || 'New';
+          const name = `"${(sub.name || '').replace(/"/g, '""')}"`;
+          const phone = `"${(sub.phone || '').replace(/"/g, '""')}"`;
+          
+          let detailCol = '';
+          let detailsDesc = '';
+          if (sub.type === 'Quiz') {
+            detailCol = `${sub.score || '95'}%`;
+            detailsDesc = `"Stage: ${sub.answers?.step1 || ''}, Age: ${sub.answers?.step2 || ''}, Impact: ${sub.answers?.step3 || ''}"`;
+          } else {
+            detailCol = `"${(sub.email || '').replace(/"/g, '""')}"`;
+            detailsDesc = `"${(sub.message || '').replace(/"/g, '""')}"`;
+          }
+
+          const internalNotes = `"${(sub.notes || '').replace(/"/g, '""')}"`;
+          const timestamp = sub.timestamp || '';
+
+          csvContent += `${id},${type},${status},${name},${phone},${detailCol},${detailsDesc},${internalNotes},${timestamp}\n`;
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', `confident_strands_crm_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+
+      // ==================== ESCAPE HTML HELPER ====================
+      function escapeHtml(str) {
+        if (!str) return '';
+        return str
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      // Initial Bootstrap load
+      switchTab('dashboard');
+    });
+  </script>
+</body>
+
+</html>

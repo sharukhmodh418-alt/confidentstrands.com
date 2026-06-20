@@ -1,0 +1,23 @@
+[
+  {
+    "id": "s1",
+    "name": "Hair Patch Fitting + Professional Fitting",
+    "price": "1499",
+    "duration": "60 mins",
+    "description": "Expert customized fitting, bonding, styling, and blending of your hair patch."
+  },
+  {
+    "id": "s2",
+    "name": "Monthly Maintenance",
+    "price": "199",
+    "duration": "45 mins",
+    "description": "Re-bonding service, deep cleaning, condition check, and haircut adjustments."
+  },
+  {
+    "id": "s3",
+    "name": "Premium Hair Patch",
+    "price": "1199",
+    "duration": "30 mins",
+    "description": "100% natural human hair patch, custom matched to color and density."
+  }
+]
